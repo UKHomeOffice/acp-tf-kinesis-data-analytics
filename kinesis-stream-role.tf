@@ -1,6 +1,4 @@
 data "aws_iam_policy_document" "kinesis_assume_role_policy_document" {
-  name = "assume_role"
-
   statement {
     actions = ["sts:AssumeRole"]
 
@@ -12,7 +10,7 @@ data "aws_iam_policy_document" "kinesis_assume_role_policy_document" {
 }
 
 resource "aws_iam_role" "kinesis_assume_role" {
-  name_prefix = "kinesis-assume-role-"
+  name_prefix        = "kinesis-assume-role-"
   assume_role_policy = "${data.aws_iam_policy_document.kinesis_assume_role_policy_document.json}"
 }
 
@@ -38,7 +36,7 @@ data "aws_iam_policy_document" "read_write_stream_document" {
 
 
 resource "aws_iam_role_policy" "read_write_stream_policy" {
-  name_prefix  = "read_write_stream_policy-"
-  role   = "${aws_iam_role.assume_role.id}"
-  policy = "${data.aws_iam_policy_document.read_write_stream_document.json}"
+  name_prefix = "read_write_stream_policy-"
+  role        = "${aws_iam_role.kinesis_assume_role.id}"
+  policy      = "${data.aws_iam_policy_document.read_write_stream_document.json}"
 }
