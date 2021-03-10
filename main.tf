@@ -7,30 +7,34 @@ resource "aws_kinesis_analytics_application" "analytics_application" {
     name_prefix = "SOURCE_SQL_STREAM"
 
     kinesis_stream {
-      resource_arn = var.input_kinesis_stream.arn
+      resource_arn = "${data.aws_kinesis_stream.stream.arn}"
       role_arn     = "${aws_iam_role.kinesis_assume_role.arn}"
     }
-  }
-  schema {
 
-    record_columns {
-      for_each = var.data_columns
+    schema {
+      dynamic "record_columns" {
+        for_each = var.data_columns
 
-      mapping  = each.value.mapping
-      name     = each.value.name
-      sql_type = each.value.sql_type
-    }
+        content {
+          mapping  = record_columns.value.mapping
+          name     = record_columns.value.name
+          sql_type = record_columns.value.sql_type
+        }
 
-    record_format {
-      mapping_parameters {
-        json {
-          record_row_path = "$"
+      }
+
+      record_encoding = "UTF-8"
+
+      record_format {
+        mapping_parameters {
+          json {
+            record_row_path = "$"
+          }
         }
       }
     }
+
   }
-
-
 
   outputs {
     name = var.in_application_output_stream
@@ -43,6 +47,8 @@ resource "aws_kinesis_analytics_application" "analytics_application" {
       role_arn     = "${aws_iam_role.kinesis_assume_role.arn}"
     }
   }
+
+
 
 
 
