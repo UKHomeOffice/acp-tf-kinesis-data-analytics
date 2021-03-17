@@ -10,15 +10,24 @@ data "aws_iam_policy_document" "kinesis_assume_role_policy_document" {
 }
 
 resource "aws_iam_role" "kinesis_assume_role" {
-  name_prefix        = "kinesis-assume-role-"
-  assume_role_policy = "${data.aws_iam_policy_document.kinesis_assume_role_policy_document.json}"
+  name_prefix        = "${var.analytics_application_name}-role-"
+  assume_role_policy = data.aws_iam_policy_document.kinesis_assume_role_policy_document.json
 }
 
 
 data "aws_iam_policy_document" "read_write_stream_document" {
+  
   statement {
-    sid = "ReadWriteKinesis"
+    actions = [
+      "kms:Decrypt"
+    ]
 
+    resources = [
+      data.aws_kms_key.input_stream_key.arn
+    ]
+  }
+  
+  statement {
     actions = [
       "kinesis:DescribeStream",
       "kinesis:GetShardIterator",
@@ -34,9 +43,8 @@ data "aws_iam_policy_document" "read_write_stream_document" {
 
 }
 
-
 resource "aws_iam_role_policy" "read_write_stream_policy" {
-  name_prefix = "read_write_stream_policy-"
-  role        = "${aws_iam_role.kinesis_assume_role.id}"
-  policy      = "${data.aws_iam_policy_document.read_write_stream_document.json}"
+  name_prefix = "${var.analytics_application_name}-role-policy-"
+  role        = aws_iam_role.kinesis_assume_role.id
+  policy      = data.aws_iam_policy_document.read_write_stream_document.json
 }

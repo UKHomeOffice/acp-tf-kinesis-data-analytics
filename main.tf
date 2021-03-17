@@ -1,14 +1,18 @@
 resource "aws_kinesis_analytics_application" "analytics_application" {
   name = var.analytics_application_name
-  code = "CREATE OR REPLACE STREAM \"DESTINATION_SQL_STREAM\" (index VARCHAR(32), namespace VARCHAR(32)); CREATE OR REPLACE PUMP \"STREAM_PUMP\" AS INSERT INTO \"DESTINATION_SQL_STREAM\" SELECT STREAM \"index_prefix\", \"namespace_name\" FROM \"SOURCE_SQL_STREAM_001\" WHERE \"namespace_name\" = '${var.namespace_name}';"
 
+  code = <<EOF
+CREATE OR REPLACE STREAM "DESTINATION_SQL_STREAM" (index VARCHAR(32), namespace VARCHAR(32)); 
+CREATE OR REPLACE PUMP "STREAM_PUMP" AS INSERT INTO "DESTINATION_SQL_STREAM"
+SELECT STREAM "index_prefix", "namespace_name" FROM "SOURCE_SQL_STREAM_001" WHERE "namespace_name" = '${var.namespace_name}';
+EOF
   inputs {
 
     name_prefix = "SOURCE_SQL_STREAM"
 
     kinesis_stream {
-      resource_arn = "${data.aws_kinesis_stream.stream.arn}"
-      role_arn     = "${aws_iam_role.kinesis_assume_role.arn}"
+      resource_arn = data.aws_kinesis_stream.stream.arn
+      role_arn     = aws_iam_role.kinesis_assume_role.arn
     }
 
     schema {
@@ -44,13 +48,9 @@ resource "aws_kinesis_analytics_application" "analytics_application" {
 
     kinesis_stream {
       resource_arn = var.output_kinesis_stream_arn
-      role_arn     = "${aws_iam_role.kinesis_assume_role.arn}"
+      role_arn     = aws_iam_role.kinesis_assume_role.arn
     }
   }
-
-
-
-
 
   tags = {
     Environment = var.environment
