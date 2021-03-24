@@ -27,9 +27,9 @@ variable "in_application_output_stream" {
   type        = string
 }
 
-variable "output_kinesis_stream_arn" {
-  description = "The name of the output Kinesis stream"
-  type        = string
+variable "output_kinesis_stream_name" {
+  description = "The name of the source Kinesis datastream"
+  default     = "${var.namespace_name}-log-stream"
 }
 
 variable "environment" {

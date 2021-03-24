@@ -11,7 +11,7 @@ EOF
     name_prefix = "SOURCE_SQL_STREAM"
 
     kinesis_stream {
-      resource_arn = data.aws_kinesis_stream.stream.arn
+      resource_arn = data.aws_kinesis_stream.input_stream.arn
       role_arn     = aws_iam_role.kinesis_assume_role.arn
     }
 
@@ -45,7 +45,7 @@ EOF
     }
 
     kinesis_stream {
-      resource_arn = var.output_kinesis_stream_arn
+      resource_arn = data.aws_kinesis_stream.output_stream.arn 
       role_arn     = aws_iam_role.kinesis_assume_role.arn
     }
   }
