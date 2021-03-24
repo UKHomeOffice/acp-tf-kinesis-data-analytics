@@ -24,7 +24,6 @@ EOF
           name     = record_columns.value.name
           sql_type = record_columns.value.sql_type
         }
-
       }
 
       record_encoding = "UTF-8"
@@ -37,8 +36,7 @@ EOF
         }
       }
     }
-
-  }
+   }
 
   outputs {
     name = var.in_application_output_stream
