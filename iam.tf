@@ -9,20 +9,24 @@ data "aws_iam_policy_document" "kinesis_assume_role_policy_document" {
   }
 }
 
-resource "aws_iam_role" "kinesis_assume_read_role" {
-  name_prefix        = "${var.analytics_application_name}-read-role-"
+## READ POLICY
+
+resource "aws_iam_role" "kinesis_read_role" {
+  name_prefix        = "${var.analytics_application_name}-read-"
   assume_role_policy = data.aws_iam_policy_document.kinesis_assume_role_policy_document.json
+}
+
+resource "aws_iam_role_policy" "read_stream_policy" {
+  name_prefix = "${var.analytics_application_name}-read-"
+  role        = aws_iam_role.kinesis_read_role.id
+  policy      = data.aws_iam_policy_document.read_policy.json
 }
 
 data "aws_kms_key" "input_stream_key" {
   key_id = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alias/${var.input_kinesis_stream_name}"
 }
 
-data "aws_kms_key" "output_stream_key" {
-  key_id = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alias/${var.output_kinesis_stream_name}"
-}
-
-data "aws_iam_policy_document" "read_stream_document" {
+data "aws_iam_policy_document" "read_policy" {
   
   statement {
     actions = [
@@ -49,25 +53,20 @@ data "aws_iam_policy_document" "read_stream_document" {
 
 }
 
-resource "aws_iam_role_policy" "read_stream_policy" {
-  name_prefix = "${var.analytics_application_name}-read-role-policy-"
-  role        = aws_iam_role.kinesis_assume_role.id
-  policy      = data.aws_iam_policy_document.read_stream_document.json
+## WRITE POLICY
+
+resource "aws_iam_role" "kinesis_write_role" {
+  name_prefix        = "${var.analytics_application_name}-write-"
+  assume_role_policy = data.aws_iam_policy_document.kinesis_assume_role_policy_document.json
 }
 
-# WRITE
+resource "aws_iam_role_policy" "write_policy" {
+  name_prefix = "${var.analytics_application_name}-write-"
+  role        = aws_iam_role.kinesis_write_role.id
+  policy      = data.aws_iam_policy_document.write_policy.json
+}
 
-data "aws_iam_policy_document" "write_stream_document" {
-  
-  statement {
-    actions = [
-      "kms:Encrypt"
-    ]
-
-    resources = [
-      data.aws_kms_key.output_stream_key.arn
-    ]
-  }
+data "aws_iam_policy_document" "write_policy" {
   
   statement {
     actions = [
@@ -80,10 +79,4 @@ data "aws_iam_policy_document" "write_stream_document" {
     ]
   }
 
-}
-
-resource "aws_iam_role_policy" "write_stream_policy" {
-  name_prefix = "${var.analytics_application_name}-write-role-policy-"
-  role        = aws_iam_role.kinesis_assume_role.id
-  policy      = data.aws_iam_policy_document.write_stream_document.json
 }

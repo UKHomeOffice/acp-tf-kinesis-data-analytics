@@ -12,7 +12,7 @@ EOF
 
     kinesis_stream {
       resource_arn = data.aws_kinesis_stream.input_stream.arn
-      role_arn     = aws_iam_role.kinesis_assume_role.arn
+      role_arn     = aws_iam_role.kinesis_read_role.arn
     }
 
     schema {
@@ -46,7 +46,7 @@ EOF
 
     kinesis_stream {
       resource_arn = data.aws_kinesis_stream.output_stream.arn 
-      role_arn     = aws_iam_role.kinesis_assume_role.arn
+      role_arn     = aws_iam_role.kinesis_write_role.arn
     }
   }
 
