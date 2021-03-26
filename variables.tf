@@ -3,18 +3,9 @@ variable "analytics_application_name" {
   type        = string
 }
 
-variable "namespace_name" {
-  description = "The namespace from which you want to retrive logs from."
-  type        = string
-}
-
-variable "data_columns" {
-  description = "The data columns for the schema"
-  type = list(object({
-    mapping  = string
-    name     = string
-    sql_type = string
-  }))
+variable "namespaces" {
+  description = "The namespaces from which you want to retrive logs."
+  type        = list(string)
 }
 
 variable "input_kinesis_stream_name" {
@@ -32,5 +23,5 @@ variable "output_kinesis_stream_name" {
 }
 
 variable "environment" {
-  type        = string
+  type = string
 }

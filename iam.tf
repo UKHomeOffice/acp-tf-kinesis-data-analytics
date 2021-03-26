@@ -27,7 +27,7 @@ data "aws_kms_key" "input_stream_key" {
 }
 
 data "aws_iam_policy_document" "read_policy" {
-  
+
   statement {
     actions = [
       "kms:Decrypt"
@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "read_policy" {
       data.aws_kms_key.input_stream_key.arn
     ]
   }
-  
+
   statement {
     actions = [
       "kinesis:DescribeStream",
@@ -67,7 +67,7 @@ resource "aws_iam_role_policy" "write_policy" {
 }
 
 data "aws_iam_policy_document" "write_policy" {
-  
+
   statement {
     actions = [
       "kinesis:PutRecord",
