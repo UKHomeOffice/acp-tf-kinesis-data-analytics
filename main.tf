@@ -76,9 +76,9 @@ EOT
   }
 
   dynamic "outputs" {
-    for_each = local.namespaces
+    for_each = var.namespaces
     content {
-      name = outputs.value
+      name = replace(outputs.value, "-", "_")
       
       schema {
         record_format_type = "JSON"

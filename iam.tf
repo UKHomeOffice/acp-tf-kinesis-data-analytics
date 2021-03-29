@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "read_policy" {
 
 resource "aws_iam_role" "kinesis_write_role" {
 
-  for_each = local.namespaces
+  for_each = var.namespaces
 
   name_prefix        = "${each.value}-write-"
   description        = "Kinesis Analytics role for writing to stream with name ${each.value}"
@@ -66,7 +66,7 @@ resource "aws_iam_role" "kinesis_write_role" {
 
 resource "aws_iam_role_policy" "write_policy" {
 
-  for_each = local.namespaces
+  for_each = var.namespaces
 
   name_prefix = "${each.value}-write-"
   role        = aws_iam_role.kinesis_write_role[each.key].id
@@ -75,7 +75,7 @@ resource "aws_iam_role_policy" "write_policy" {
 
 data "aws_iam_policy_document" "write_policy" {
 
-  for_each = local.namespaces
+  for_each = var.namespaces
 
   statement {
     actions = [
