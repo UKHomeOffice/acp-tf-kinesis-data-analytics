@@ -2,15 +2,15 @@ resource "aws_kinesis_analytics_application" "analytics_application" {
   name = var.analytics_application_name
 
   code = <<EOT
-%{for namespace in local.namespaces~}
+%{for namespace in var.namespaces~}
 -- ns ${namespace}
-CREATE OR REPLACE STREAM "${namespace}" (index VARCHAR(32), 
+CREATE OR REPLACE STREAM "${replace(namespace, "-", "_")}" (index VARCHAR(32), 
                                         namespace VARCHAR(32), 
                                         kubernetes VARCHAR(500), 
                                         message_json VARCHAR(3000), 
                                         audit_json VARCHAR(3000), 
                                         log_timestamp TIMESTAMP); 
-CREATE OR REPLACE PUMP "STREAM_PUMP_${namespace}" AS INSERT INTO "${namespace}"
+CREATE OR REPLACE PUMP "STREAM_PUMP_${replace(namespace, "-", "_")}" AS INSERT INTO "${replace(namespace, "-", "_")}"
 SELECT STREAM "index_prefix", 
                "namespace_name", 
                "kubernetes_data", 
