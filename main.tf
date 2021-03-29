@@ -2,15 +2,15 @@ resource "aws_kinesis_analytics_application" "analytics_application" {
   name = var.analytics_application_name
 
   code = <<EOT
-%{for namespace in var.namespaces~}
+%{for namespace in local.namespaces~}
 -- ns ${namespace}
-CREATE OR REPLACE STREAM "DESTINATION_${namespace}" (index VARCHAR(32), 
-                                                   namespace VARCHAR(32), 
-                                                   kubernetes VARCHAR(500), 
-                                                   message_json VARCHAR(3000), 
-                                                   audit_json VARCHAR(3000), 
-                                                   log_timestamp TIMESTAMP); 
-CREATE OR REPLACE PUMP "STREAM_PUMP_${namespace}" AS INSERT INTO "DESTINATION_${namespace}"
+CREATE OR REPLACE STREAM "${namespace}" (index VARCHAR(32), 
+                                        namespace VARCHAR(32), 
+                                        kubernetes VARCHAR(500), 
+                                        message_json VARCHAR(3000), 
+                                        audit_json VARCHAR(3000), 
+                                        log_timestamp TIMESTAMP); 
+CREATE OR REPLACE PUMP "STREAM_PUMP_${namespace}" AS INSERT INTO "${namespace}"
 SELECT STREAM "index_prefix", 
                "namespace_name", 
                "kubernetes_data", 
@@ -65,7 +65,6 @@ EOT
       }
 
       record_format {
-
         mapping_parameters {
 
           json {
@@ -76,27 +75,19 @@ EOT
     }
   }
 
-  outputs {
-    name = var.in_application_output_stream
-    schema {
-      record_format_type = "JSON"
-    }
+  dynamic "outputs" {
+    for_each = local.namespaces
+    content {
+      name = outputs.value
+      
+      schema {
+        record_format_type = "JSON"
+      }
 
-    kinesis_stream {
-      resource_arn = data.aws_kinesis_stream.output_stream.arn
-      role_arn     = aws_iam_role.kinesis_write_role.arn
-    }
-  }
-
-  outputs {
-    name =  "2"
-    schema {
-      record_format_type = "JSON"
-    }
-
-    kinesis_stream {
-      resource_arn = "arn:aws:kinesis:eu-west-2:670930646103:stream/test2"
-      role_arn     = aws_iam_role.kinesis_write_role.arn
+      kinesis_stream {
+        resource_arn = "arn:aws:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${outputs.value}"
+        role_arn     = aws_iam_role.kinesis_write_role[outputs.value].arn
+      }
     }
   }
 
