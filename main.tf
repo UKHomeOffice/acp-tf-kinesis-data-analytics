@@ -1,24 +1,21 @@
 resource "aws_kinesis_analytics_application" "analytics_application" {
-  name = var.analytics_application_name
+  name = var.application_name
 
   code = <<EOT
-%{for namespace in var.namespaces~}
--- ns ${namespace}
-CREATE OR REPLACE STREAM "${replace(namespace, "-", "_")}" (index VARCHAR(32), 
-                                        namespace VARCHAR(32), 
-                                        kubernetes VARCHAR(500), 
-                                        message_json VARCHAR(3000), 
-                                        audit_json VARCHAR(3000), 
-                                        log_timestamp TIMESTAMP); 
-CREATE OR REPLACE PUMP "STREAM_PUMP_${replace(namespace, "-", "_")}" AS INSERT INTO "${replace(namespace, "-", "_")}"
+CREATE OR REPLACE STREAM "${var.in_application_output_stream_name}" (index VARCHAR(32), 
+                                                                namespace VARCHAR(32), 
+                                                                kubernetes VARCHAR(500), 
+                                                                message_json VARCHAR(3000), 
+                                                                audit_json VARCHAR(3000), 
+                                                                log_timestamp TIMESTAMP); 
+CREATE OR REPLACE PUMP "STREAM_PUMP" AS INSERT INTO "${var.in_application_output_stream_name}"
 SELECT STREAM "index_prefix", 
                "namespace_name", 
                "kubernetes_data", 
                "message_json", 
                "audit_json", 
                "log_timestamp" 
-FROM "SOURCE_SQL_STREAM_001" WHERE "namespace_name" = '${namespace}';
-%{endfor~}
+FROM "SOURCE_SQL_STREAM_001" WHERE ${var.selector};
 EOT
 
   inputs {
@@ -75,21 +72,18 @@ EOT
     }
   }
 
-  dynamic "outputs" {
-    for_each = var.namespaces
-    content {
-      name = replace(outputs.value, "-", "_")
-      
-      schema {
-        record_format_type = "JSON"
-      }
+  outputs {
+    name = var.in_application_output_stream_name
+    schema {
+      record_format_type = "JSON"
+    }
 
-      kinesis_stream {
-        resource_arn = "arn:aws:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${outputs.value}"
-        role_arn     = aws_iam_role.kinesis_write_role[outputs.value].arn
-      }
+    kinesis_stream {
+      resource_arn = "arn:aws:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${var.output_kinesis_stream_name}"
+      role_arn     = aws_iam_role.kinesis_write_role.arn
     }
   }
+
 
   tags = {
     Environment = var.environment
