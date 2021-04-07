@@ -12,12 +12,12 @@ data "aws_iam_policy_document" "kinesis_assume_role_policy_document" {
 ## READ POLICY
 
 resource "aws_iam_role" "kinesis_read_role" {
-  name_prefix        = "${var.analytics_application_name}-read-"
+  name_prefix        = "${var.application_name}-read-"
   assume_role_policy = data.aws_iam_policy_document.kinesis_assume_role_policy_document.json
 }
 
 resource "aws_iam_role_policy" "read_stream_policy" {
-  name_prefix = "${var.analytics_application_name}-read-"
+  name_prefix = "${var.application_name}-read-"
   role        = aws_iam_role.kinesis_read_role.id
   policy      = data.aws_iam_policy_document.read_policy.json
 }
@@ -57,25 +57,19 @@ data "aws_iam_policy_document" "read_policy" {
 
 resource "aws_iam_role" "kinesis_write_role" {
 
-  for_each = var.namespaces
-
-  name_prefix        = "${each.value}-write-"
-  description        = "Kinesis Analytics role for writing to stream with name ${each.value}"
+  name_prefix        = "${var.application_name}-write-"
+  description        = "Kinesis Analytics role for writing to stream ${var.output_kinesis_stream_name}"
   assume_role_policy = data.aws_iam_policy_document.kinesis_assume_role_policy_document.json
 }
 
 resource "aws_iam_role_policy" "write_policy" {
 
-  for_each = var.namespaces
-
-  name_prefix = "${each.value}-write-"
-  role        = aws_iam_role.kinesis_write_role[each.key].id
-  policy      = data.aws_iam_policy_document.write_policy[each.key].json
+  name_prefix = "${var.application_name}-write-"
+  role        = aws_iam_role.kinesis_write_role.id
+  policy      = data.aws_iam_policy_document.write_policy.json
 }
 
 data "aws_iam_policy_document" "write_policy" {
-
-  for_each = var.namespaces
 
   statement {
     actions = [
@@ -84,7 +78,7 @@ data "aws_iam_policy_document" "write_policy" {
     ]
 
     resources = [
-      "arn:aws:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${each.value}",
+      "arn:aws:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${var.output_kinesis_stream_name}",
     ]
   }
 
