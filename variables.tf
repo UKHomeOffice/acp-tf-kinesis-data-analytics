@@ -22,5 +22,5 @@ variable "output_kinesis_stream_name" {
 }
 
 variable "tags" {
-  
+ type = map(string) 
 }
