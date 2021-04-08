@@ -85,7 +85,5 @@ EOT
   }
 
 
-  tags = {
-    Environment = var.environment
-  }
+  tags = var.tags
 }

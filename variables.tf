@@ -13,14 +13,14 @@ variable "input_kinesis_stream_name" {
   default     = "acp-log-stream"
 }
 
-variable "environment" {
-  type = string
-}
-
 variable "in_application_output_stream_name" {
   default = "DESTINATION_STREAM"
 }
 
 variable "output_kinesis_stream_name" {
   description = "The name of the destination Kinesis datastream"
+}
+
+variable "tags" {
+  
 }
