@@ -3,14 +3,16 @@ resource "aws_kinesis_analytics_application" "analytics_application" {
 
   code = <<EOT
 CREATE OR REPLACE STREAM "${var.in_application_output_stream_name}" (index VARCHAR(32), 
-                                                                    namespace VARCHAR(32), 
-                                                                    kubernetes VARCHAR(500), 
-                                                                    message_json VARCHAR(3000), 
-                                                                    audit_json VARCHAR(3000), 
-                                                                    log_timestamp TIMESTAMP); 
+                                                                     namespace VARCHAR(32),
+                                                                     audit_namespace VARCHAR(32),
+                                                                     kubernetes VARCHAR(500), 
+                                                                     message_json VARCHAR(3000), 
+                                                                     audit_json VARCHAR(3000), 
+                                                                     log_timestamp TIMESTAMP); 
 CREATE OR REPLACE PUMP "STREAM_PUMP" AS INSERT INTO "${var.in_application_output_stream_name}"
 SELECT STREAM "index_prefix", 
-               "namespace_name", 
+               "namespace_name",
+               "audit_namespace_name",
                "kubernetes_data", 
                "message_json", 
                "audit_json", 
@@ -30,6 +32,7 @@ EOT
     schema {
       record_encoding = "UTF-8"
 
+
       record_columns {
         mapping  = "$.kubernetes"
         name     = "kubernetes_data"
@@ -43,6 +46,11 @@ EOT
       record_columns {
         mapping  = "$.kubernetes.namespace_name"
         name     = "namespace_name"
+        sql_type = "VARCHAR(32)"
+      }
+      record_columns {
+        mapping  = "$.audit_json.objectRef.namespace"
+        name     = "audit_namespace_name"
         sql_type = "VARCHAR(32)"
       }
       record_columns {
