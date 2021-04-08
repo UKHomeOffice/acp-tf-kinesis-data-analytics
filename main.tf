@@ -3,11 +3,11 @@ resource "aws_kinesis_analytics_application" "analytics_application" {
 
   code = <<EOT
 CREATE OR REPLACE STREAM "${var.in_application_output_stream_name}" (index VARCHAR(32), 
-                                                                namespace VARCHAR(32), 
-                                                                kubernetes VARCHAR(500), 
-                                                                message_json VARCHAR(3000), 
-                                                                audit_json VARCHAR(3000), 
-                                                                log_timestamp TIMESTAMP); 
+                                                                    namespace VARCHAR(32), 
+                                                                    kubernetes VARCHAR(500), 
+                                                                    message_json VARCHAR(3000), 
+                                                                    audit_json VARCHAR(3000), 
+                                                                    log_timestamp TIMESTAMP); 
 CREATE OR REPLACE PUMP "STREAM_PUMP" AS INSERT INTO "${var.in_application_output_stream_name}"
 SELECT STREAM "index_prefix", 
                "namespace_name", 

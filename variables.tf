@@ -18,7 +18,7 @@ variable "environment" {
 }
 
 variable "in_application_output_stream_name" {
- default = "DESTINATION_STREAM" 
+  default = "DESTINATION_STREAM"
 }
 
 variable "output_kinesis_stream_name" {

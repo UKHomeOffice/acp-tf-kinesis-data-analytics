@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "write_policy" {
     ]
   }
 
-    statement {
+  statement {
     actions = [
       "kms:GenerateDataKey"
     ]
