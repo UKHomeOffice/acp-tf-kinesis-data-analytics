@@ -69,9 +69,6 @@ resource "aws_iam_role_policy" "write_policy" {
   policy      = data.aws_iam_policy_document.write_policy.json
 }
 
-# data "aws_kms_key" "output_stream_key" {
-#   key_id = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alias/${var.output_stream_name}"
-# }
 
 data "aws_iam_policy_document" "write_policy" {
 
