@@ -17,8 +17,12 @@ variable "in_application_output_stream_name" {
   default = "DESTINATION_STREAM"
 }
 
-variable "output_kinesis_stream_name" {
+variable "output_stream_name" {
   description = "The name of the destination Kinesis datastream"
+}
+
+variable "output_stream_shard_count" {
+  default = 1
 }
 
 variable "tags" {

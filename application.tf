@@ -79,7 +79,7 @@ EOT
     }
 
     kinesis_stream {
-      resource_arn = "arn:aws:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${var.output_kinesis_stream_name}"
+      resource_arn = module.stream.stream_arn
       role_arn     = aws_iam_role.kinesis_write_role.arn
     }
   }

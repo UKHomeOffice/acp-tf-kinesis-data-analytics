@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "read_policy" {
 resource "aws_iam_role" "kinesis_write_role" {
 
   name_prefix        = "${var.application_name}-write-"
-  description        = "Kinesis Analytics role for writing to stream ${var.output_kinesis_stream_name}"
+  description        = "Kinesis Analytics role for writing to stream ${var.output_stream_name}"
   assume_role_policy = data.aws_iam_policy_document.kinesis_assume_role_policy_document.json
 }
 
@@ -69,9 +69,9 @@ resource "aws_iam_role_policy" "write_policy" {
   policy      = data.aws_iam_policy_document.write_policy.json
 }
 
-data "aws_kms_key" "output_stream_key" {
-  key_id = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alias/${var.output_kinesis_stream_name}"
-}
+# data "aws_kms_key" "output_stream_key" {
+#   key_id = "arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alias/${var.output_stream_name}"
+# }
 
 data "aws_iam_policy_document" "write_policy" {
 
@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "write_policy" {
     ]
 
     resources = [
-      "arn:aws:kinesis:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:stream/${var.output_kinesis_stream_name}",
+      module.stream.stream_arn
     ]
   }
 
@@ -93,7 +93,7 @@ data "aws_iam_policy_document" "write_policy" {
     ]
 
     resources = [
-      data.aws_kms_key.output_stream_key.arn
+      module.stream.stream_key
     ]
   }
 
