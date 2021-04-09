@@ -6,24 +6,16 @@ module "stream" {
   retention_period = 24
   consumer_user    = true
   producer_user    = false
-  exporter_user    = true
+  exporter_user    = false
 
   tags = var.tags
 
 }
 
 output "consumer_access_key" {
-  value = module.stream.consumer_access_key
+  value = map(module.stream.stream_arn, module.stream.consumer_access_key)
 }
 
 output "consumer_secret_key" {
-  value = module.stream.consumer_secret_key
-}
-
-output "cloudwatch_exporter_access_key" {
-  value = module.stream.cloudwatch_exporter_access_key
-}
-
-output "cloudwatch_exporter_secret_key" {
-  value = module.stream.cloudwatch_exporter_secret_key
+  value = map(module.stream.stream_arn, module.stream.consumer_secret_key)
 }
