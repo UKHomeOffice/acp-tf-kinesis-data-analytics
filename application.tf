@@ -29,6 +29,10 @@ EOT
       role_arn     = aws_iam_role.kinesis_read_role.arn
     }
 
+    starting_position_configuration {
+      starting_position = "NOW"
+    }
+
     schema {
       record_encoding = "UTF-8"
 
@@ -91,7 +95,8 @@ EOT
       role_arn     = aws_iam_role.kinesis_write_role.arn
     }
   }
-
+  
+  start_application = true
 
   tags = var.tags
 }

@@ -28,3 +28,19 @@ variable "output_stream_shard_count" {
 variable "tags" {
  type = map(string) 
 }
+
+variable "output_stream_retention_period" {
+  default = 24
+}
+
+variable "output_stream_consumer_user" {
+  default = true
+}
+
+variable "output_stream_producer_user" {
+  default = false
+}
+
+variable "output_stream_exporter_user" {
+  default = true
+}
