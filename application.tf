@@ -29,6 +29,10 @@ EOT
       role_arn     = aws_iam_role.kinesis_read_role.arn
     }
 
+    parallelism {
+      count = var.parallelism
+    }
+
     starting_position_configuration {
       starting_position = "NOW"
     }
@@ -95,7 +99,7 @@ EOT
       role_arn     = aws_iam_role.kinesis_write_role.arn
     }
   }
-  
+
   start_application = true
 
   tags = var.tags

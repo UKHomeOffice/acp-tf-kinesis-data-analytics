@@ -44,3 +44,7 @@ variable "output_stream_producer_user" {
 variable "output_stream_exporter_user" {
   default = true
 }
+
+variable "parallelism" {
+  default = 1
+}
