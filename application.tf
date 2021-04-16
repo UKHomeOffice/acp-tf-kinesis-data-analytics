@@ -8,16 +8,18 @@ CREATE OR REPLACE STREAM "${var.in_application_output_stream_name}" (index VARCH
                                                                      kubernetes VARCHAR(500), 
                                                                      message_json VARCHAR(3000), 
                                                                      audit_json VARCHAR(3000), 
-                                                                     log_timestamp TIMESTAMP); 
-CREATE OR REPLACE PUMP "STREAM_PUMP" AS INSERT INTO "${var.in_application_output_stream_name}"
+                                                                     log_timestamp TIMESTAMP);
+%{ for index in range(1, var.parallelism+1) ~}
+CREATE OR REPLACE PUMP STREAM_PUMP_${format("%03.0f", index)} AS INSERT INTO "${var.in_application_output_stream_name}"
 SELECT STREAM "index_prefix", 
                "namespace_name",
                "audit_namespace_name",
                "kubernetes_data", 
-               "message_json", 
+               "message_json",
                "audit_json", 
                "log_timestamp" 
-FROM "SOURCE_SQL_STREAM_001" WHERE ${var.selector};
+FROM SOURCE_SQL_STREAM_${format("%03.0f", index)} WHERE SOURCE_SQL_STREAM_${format("%03.0f", index)}."namespace_name" ${var.selector};
+%{ endfor ~}
 EOT
 
   inputs {
