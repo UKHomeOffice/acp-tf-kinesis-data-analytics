@@ -1,23 +1,24 @@
 resource "aws_kinesis_analytics_application" "analytics_application" {
   name = var.application_name
 
+
   code = <<EOT
-CREATE OR REPLACE STREAM "${var.in_application_output_stream_name}" (index VARCHAR(32), 
+CREATE OR REPLACE STREAM "${var.in_application_output_stream_name}" (index VARCHAR(32),
                                                                      namespace VARCHAR(32),
                                                                      audit_namespace VARCHAR(32),
-                                                                     kubernetes VARCHAR(500), 
-                                                                     message_json VARCHAR(3000), 
-                                                                     audit_json VARCHAR(3000), 
+                                                                     kubernetes VARCHAR(1000),
+                                                                     message_json VARCHAR(3000),
+                                                                     audit_json VARCHAR(3000),
                                                                      log_timestamp TIMESTAMP);
 %{ for index in range(1, var.parallelism+1) ~}
 CREATE OR REPLACE PUMP STREAM_PUMP_${format("%03.0f", index)} AS INSERT INTO "${var.in_application_output_stream_name}"
-SELECT STREAM "index_prefix", 
+SELECT STREAM "index_prefix",
                "namespace_name",
                "audit_namespace_name",
-               "kubernetes_data", 
+               "kubernetes_data",
                "message_json",
-               "audit_json", 
-               "log_timestamp" 
+               "audit_json",
+               "log_timestamp"
 FROM SOURCE_SQL_STREAM_${format("%03.0f", index)} WHERE SOURCE_SQL_STREAM_${format("%03.0f", index)}."namespace_name" ${var.selector};
 %{ endfor ~}
 EOT
@@ -46,7 +47,7 @@ EOT
       record_columns {
         mapping  = "$.kubernetes"
         name     = "kubernetes_data"
-        sql_type = "VARCHAR(500)"
+        sql_type = "VARCHAR(1000)"
       }
       record_columns {
         mapping  = "$.index_prefix"
