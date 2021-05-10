@@ -1,5 +1,5 @@
 module "stream" {
-  source = "git::https://github.com/UKHomeOffice/acp-tf-kinesis-streams?ref=v0.1.6"
+  source = "git::https://github.com/UKHomeOffice/acp-tf-kinesis-streams?ref=v0.1.7"
 
   stream_name      = var.output_stream_name
   shard_count      = var.output_stream_shard_count
