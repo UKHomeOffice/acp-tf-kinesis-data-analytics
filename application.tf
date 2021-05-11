@@ -67,12 +67,12 @@ EOT
       record_columns {
         mapping  = "$.message_json"
         name     = "message_json"
-        sql_type = "VARCHAR(3000)"
+        sql_type = "VARCHAR(10000)"
       }
       record_columns {
         mapping  = "$.audit_json"
         name     = "audit_json"
-        sql_type = "VARCHAR(3000)"
+        sql_type = "VARCHAR(3000
       }
       record_columns {
         mapping  = "$.time"
