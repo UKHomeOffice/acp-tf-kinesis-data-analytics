@@ -7,7 +7,7 @@ CREATE OR REPLACE STREAM "${var.in_application_output_stream_name}" (index VARCH
                                                                      namespace VARCHAR(32),
                                                                      audit_namespace VARCHAR(32),
                                                                      kubernetes VARCHAR(1000),
-                                                                     message_json VARCHAR(5000),
+                                                                     message_json VARCHAR(10000),
                                                                      audit_json VARCHAR(3000),
                                                                      log_timestamp TIMESTAMP);
 %{ for index in range(1, var.parallelism+1) ~}
@@ -67,7 +67,7 @@ EOT
       record_columns {
         mapping  = "$.message_json"
         name     = "message_json"
-        sql_type = "VARCHAR(3000)"
+        sql_type = "VARCHAR(10000)"
       }
       record_columns {
         mapping  = "$.audit_json"
